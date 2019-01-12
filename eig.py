@@ -9,11 +9,13 @@ eps = 10**(-6)
 
 def eigenpair(A: array) -> Tuple[array, float]:
     eigvec = rand(A.shape[1])
-    eigval = ((A @ eigvec).T @ eigvec) / (eigvec.T @ eigvec)
+    eigvec_next = A @ eigvec
+    eigval = eigvec_next.T @ eigvec_next
 
-    while norm(A @ eigvec - eigval @ eigvec) > eps:
+    while norm(eigvec_next - eigval * eigvec) > eps:
+        eigvec = eigvec_next / norm(eigvec_next)
         eigvec_next = A @ eigvec
-        v = eigvec_next / norm(eigvec_next)
+        eigval = eigvec_next.T @ eigvec
 
     return eigvec, eigval
 
