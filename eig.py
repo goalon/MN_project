@@ -2,9 +2,10 @@
 
 
 from typing import Tuple, List
-from numpy import array, outer, identity, loadtxt
+from numpy import array, outer, identity, loadtxt, savetxt, asarray
 from numpy.random import rand
 from numpy.linalg import norm, solve
+import sys
 
 
 eps = 10**(-8)
@@ -44,7 +45,7 @@ def eigenpair(A: array, power_matrix: array, inv: bool = False) -> Tuple[array, 
     return eigvec, eigval
 
 
-def compute_eigenpairs(A: array, n: int, inv: bool = False) -> Tuple[List[array], List[float]]:
+def compute_eigenpairs(A: array, eignum: int, inv: bool = False) -> Tuple[List[array], List[float]]:
     id_matrix = identity(A.shape[1])
     S = id_matrix * 0
     eigvec, eigval = eigenpair(A if inv else id_matrix, id_matrix - A @ S if inv else A - S, inv)
@@ -52,7 +53,7 @@ def compute_eigenpairs(A: array, n: int, inv: bool = False) -> Tuple[List[array]
     eigvals = [eigval]
     eigvecs_mod = [eigvec]
 
-    for i in range(n - 1):
+    for i in range(eignum - 1):
         S = S + outer(eigval * eigvec, eigvec.T)
         eigvec, eigval = eigenpair(A if inv else id_matrix, id_matrix - A @ S if inv else A - S, inv)
         eigvals.append(eigval)
@@ -62,6 +63,20 @@ def compute_eigenpairs(A: array, n: int, inv: bool = False) -> Tuple[List[array]
     return eigvecs, eigvals
 
 
-A = loadtxt("test.csv")
-print(A)
-print(compute_eigenpairs(A, 5))
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    if len(args) == 3:
+        args.append(False)
+    else:
+        if args[3] == 1:
+            args[3] = False
+        else:
+            args[3] = True
+
+    csv_read, eignum, csv_write, inv = args
+    eignum = int(eignum)
+
+    A = loadtxt(csv_read)
+    eigvecs, eigvals = compute_eigenpairs(A, eignum, inv)
+    print(eigvals)
+    savetxt(csv_write, asarray(eigvecs).T)
