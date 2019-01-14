@@ -78,5 +78,5 @@ if __name__ == "__main__":
 
     A = loadtxt(csv_read)
     eigvecs, eigvals = compute_eigenpairs(A, eignum, inv)
-    print(*eigvals, sep="\n")
+    print(*eigvals)
     savetxt(csv_write, asarray(eigvecs).T)
