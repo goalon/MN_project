@@ -1,10 +1,11 @@
 from typing import Tuple, List
-from numpy import array, outer, identity
+from numpy import array, outer, identity, loadtxt
 from numpy.random import rand
 from numpy.linalg import norm, solve
+import csv
 
 
-eps = 10**(-6)
+eps = 10**(-8)
 
 
 def check_condition(A: array, power_matrix: array, eigvec: array, eigval: float) -> array:
@@ -31,8 +32,13 @@ def eigenpair(A: array, power_matrix: array) -> Tuple[array, float]:
     return eigvec, eigval
 
 
-def transforn_eigenvector(new_eigvec: array, new_eigval: float, old_eigvec: array, old_eigval: float) -> array:
-    return (new_eigval - old_eigval) * new_eigvec + old_eigval * (old_eigvec.T @ new_eigvec) * old_eigvec
+def transform_eigenvector(eigvec: array, eigvecs: array, eigvals: array) -> array:
+    eigval = eigvals[-1]
+
+    for prev_eigvec, prev_eigval in zip(reversed(eigvecs[:-1]), reversed(eigvals[:-1])):
+        eigvec = (eigval - prev_eigval) * eigvec + prev_eigval * (prev_eigvec.T @ eigvec) * prev_eigvec
+
+    return eigvec
 
 
 def compute_eigenpairs(A: array, n: int) -> Tuple[List[array], List[float]]:
@@ -40,18 +46,19 @@ def compute_eigenpairs(A: array, n: int) -> Tuple[List[array], List[float]]:
     eigvec, eigval = eigenpair(A, id_matrix)
     eigvecs = [eigvec]
     eigvals = [eigval]
+    eigvecs_mod = [eigvec]
     S = id_matrix * 0
 
     for i in range(n - 1):
         S = S + outer(eigval * eigvec, eigvec.T)
         eigvec, eigval = eigenpair(A, id_matrix - A @ S)
-        print(eigvec)
-        print(transforn_eigenvector(eigvec, eigval, eigvecs[0], eigvals[0]))
-        eigvecs.append(transforn_eigenvector(eigvec, eigval, eigvecs[0], eigvals[0]))
         eigvals.append(eigval)
+        eigvecs_mod.append(eigvec)
+        eigvecs.append(transform_eigenvector(eigvec, eigvecs_mod, eigvals))
 
     return eigvecs, eigvals
 
 
-A = array([[9, 8, 3], [4, 9, 9], [2, 9, 2]])
+A = loadtxt("test.csv")
+print(A)
 print(compute_eigenpairs(A, 3))
