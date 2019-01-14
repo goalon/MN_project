@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 """Mateusz Bajorek, 385122"""
 
 
@@ -68,7 +71,7 @@ if __name__ == "__main__":
     if len(args) == 3:
         args.append(False)
     else:
-        if args[3] == 1:
+        if args[3] == "1":
             args[3] = False
         else:
             args[3] = True
