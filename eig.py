@@ -17,12 +17,13 @@ def eigenpair(A: array, power_matrix: array) -> Tuple[array, float]:
     eigvec = solve(A, power_matrix @ eigvec)
     eigval = norm(eigvec)
     eigvec = eigvec / eigval
+    sign = 1
 
-    while norm(check_condition(A, power_matrix, eigvec, eigval)) > eps and \
-            norm(check_condition(A, power_matrix, eigvec, -eigval)) > eps:
+    while norm(check_condition(A, power_matrix, eigvec, sign * eigval)) > eps:
         eigvec = solve(A, power_matrix @ eigvec)
         eigval = norm(eigvec)
         eigvec = eigvec / eigval
+        sign *= -1
 
     if norm(check_condition(A, power_matrix, eigvec, -eigval)) <= eps:
         eigval = -eigval
@@ -53,4 +54,4 @@ def compute_eigenpairs(A: array, n: int) -> Tuple[List[array], List[float]]:
 
 
 A = array([[9, 8, 3], [4, 9, 9], [2, 9, 2]])
-print(compute_eigenpairs(A, 2))
+print(compute_eigenpairs(A, 3))
